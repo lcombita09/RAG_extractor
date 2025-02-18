@@ -1,0 +1,16 @@
+{
+    "variables": [
+        {"Organismo licitador":"Entidad que ha creado los pliegos y que creo el proceso de seleccion."},
+        {"Comunidad autonoma":"Comunidad autónoma de España donde tiene lugar la licitación"},
+        {"Provincia":"Provincia de España donde tiene lugar la licitación"},
+        {"Hospitales/Centros adheridos":"Aquellos hospitales o centros de salud que se han asociado o se han integrado formalmente a un proceso de licitación"},
+        {"Hospitales/Centros potencialmente adheridos":"Aquellos hospitales o centros de salud que todavía no están formalmente adheridos a un proceso de licitación, pero que podrían unirse en el futuro."},
+        {"Fecha de publicacion":"Fecha en que la entidad convocante (como una institución gubernamental o una empresa) hace pública la convocatoria para participar en el proceso de licitación."},
+        {"Fecha de entrega de documentacion":"Plazo límite en el cual interesados al proceso de licitación deben presentar sus propuestas."},
+        {"Vigencias: inicial y prorrogas":"La vigencia inicial es el período de tiempo durante el cual el contrato resultante de la licitación está en vigor. Las prórrogas son extensiones del período de vigencia inicial del contrato."},
+        {"PML: Precio Maximo Licitacion":"Es el valor total estimado máximo del presupuesto."},
+        {"Formula economica: criterios tecnicos":"Cálculo que se utiliza para evaluar las ofertas de los licitadores en función de su precio. Esta fórmula ayuda a determinar cuál oferta es más competitiva en términos de costo, considerando las restricciones y criterios establecidos en la licitación."},
+        {"Penalidades: clausulas en caso de interrupcion de suministro, etc":"Sanciones que se impondrán a un proveedor o contratista si no cumple con los términos del contrato, como el suministro de bienes o servicios, los plazos de entrega, la calidad requerida, etc"},
+        {"Productos/moleculas":"Bienes, productos o medicamentos que requieren ser suministrados a traves del proceso de seleccion. En una licitación, los productos pueden abarcar una amplia gama de cosas, desde bienes de consumo hasta equipos industriales o materiales."}
+    ]
+}

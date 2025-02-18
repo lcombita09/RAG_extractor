@@ -1,0 +1,8 @@
+.env.secrets
+venv/
+__pycache__/
+vectorstores/
+tmp/
+pdf_files
+validation
+evaluacion_rag.*
