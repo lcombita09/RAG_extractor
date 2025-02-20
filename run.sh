@@ -3,6 +3,8 @@
 
 source ../venv-tenders/Scripts/activate
 
+export PYTHONPATH="$(pwd)/backend"
+
 # Start FastAPI app
 uvicorn backend.main:app &
 FASTAPI_PID=$!

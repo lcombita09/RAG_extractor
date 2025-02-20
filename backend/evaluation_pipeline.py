@@ -1,6 +1,6 @@
 import json
 import os
-
+import pickle
 from langchain_openai import ChatOpenAI
 from ragas import evaluate, EvaluationDataset # funcion para evaluar
 from ragas.llms import LangchainLLMWrapper # evaluador llm
@@ -224,7 +224,7 @@ def response_relevancy_metric():
     return scorer
 
 
-def rag_system_evaluation(evaluation_dataset):
+def rag_system_evaluation():
     
     semantic = semantic_similarity_metric()
     recall = context_recall_metric()
@@ -232,6 +232,10 @@ def rag_system_evaluation(evaluation_dataset):
     faith = faithfulness_metric()
     relevancy = response_relevancy_metric()
     
+    # Cargar la lista desde el archivo
+    with open("rag_result.pkl", "rb") as f:
+        evaluation_dataset = pickle.load(f)
+
     dataset = EvaluationDataset(samples=evaluation_dataset)
     
     llm_evaluador = evaluator_llm()
@@ -253,4 +257,4 @@ def rag_system_evaluation(evaluation_dataset):
     # results.upload()
     evaluacion = results.to_pandas()
     
-    return evaluacion
+    return "Evaluación realizada con éxito"

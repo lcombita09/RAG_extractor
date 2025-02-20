@@ -1,8 +1,8 @@
 import os
 import json
 import re
-
-
+import pathlib
+import pickle
 import pandas as pd
 from ragas import SingleTurnSample
 
@@ -17,6 +17,8 @@ def tender_data_extractor(pdf_file_path):
     # First, load the secrets files to access environmental variables
     load_secrets([".env.file", ".env.secrets"])
 
+    file_name = pathlib.Path(pdf_file_path).name
+    
     # Load vectorstore
     vectorstore = load_vectorstore(embeddings_model=get_embeddings_model(), pdf_file_path=pdf_file_path)
 
@@ -46,7 +48,11 @@ def tender_data_extractor(pdf_file_path):
         tender_resume[summary_variable] = summary_variable_info
         
     ordered_tender_resume = {key: tender_resume[key] for key in ordered_variables if key in tender_resume}
-    
+
+    # Guardar la lista en un archivo
+    with open("rag_result.pkl", "wb") as f:
+        pickle.dump(rag_result, f)
+
     return ordered_tender_resume
 
 def process_variable(variable_info, vectorstore, top_k, fetch_k):
@@ -87,15 +93,13 @@ if __name__ == '__main__':
     base_dir = os.path.dirname(os.path.abspath(__file__))
     pdf_file_dir = os.path.join(base_dir, '..', "pdf_files\\")
     
-
-        
-    file_name = "document_901.pdf"
+    file_name = "document_852.pdf"
     pdf_file_path = pdf_file_dir + file_name
     print(pdf_file_path)
     result = tender_data_extractor(pdf_file_path)        
 
     # Rag evaluation
-    evaluacion = rag_system_evaluation(rag_result)
+    evaluacion = rag_system_evaluation()
     guardar = False
     
     if guardar:

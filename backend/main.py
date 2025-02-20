@@ -7,6 +7,7 @@ import shutil
 from typing import List
 import asyncio
 from tender_extractor import tender_data_extractor
+from evaluation_pipeline import rag_system_evaluation, load_ground_truth
 from chatbot import chatbot_response
 from validator import validator_response
 
@@ -97,3 +98,12 @@ async def delete_vectorstore(request: VectorstoreDeleteRequest):
         return {"status": "success", "message": f"Folder '{folder_to_delete}' deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail=f"Folder '{folder_to_delete}' not found")
+
+
+@app.post("/get_evaluation")
+async def get_evaluation():
+    try:
+        evaluation_result = rag_system_evaluation()
+        return {"evaluation_result": evaluation_result}
+    except Exception as e:
+        return {"error": str(e)}
