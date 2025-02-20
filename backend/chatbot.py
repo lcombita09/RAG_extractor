@@ -25,6 +25,8 @@ def chatbot_response(vectorstore_name: str, input_text: str, chat_history: List[
         - DOCUMENTS_TO_RETRIEVE: Número de documentos a recuperar
         - DOCUMENTS_TO_FETCH: Número de documentos a filtrar
     """
+    
+    # First, load the secrets files to access environmental variables
     load_secrets([".env.file", ".env.secrets"])
 
     vectorstore = load_vectorstore(embeddings_model=get_embeddings_model(),
@@ -36,6 +38,7 @@ def chatbot_response(vectorstore_name: str, input_text: str, chat_history: List[
     top_k = int(os.getenv("DOCUMENTS_TO_FETCH"))
 
     return generate_chatbot_response(user_question, vectorstore, top_k, fetch_k)
+
 
 def reformulate_user_question(input_text: str, chat_history: List[str]) -> str:
     """
@@ -55,6 +58,7 @@ def reformulate_user_question(input_text: str, chat_history: List[str]) -> str:
         - Si no hay historial, retorna la pregunta original
         - Considera hasta las últimas 5 preguntas del historial
     """
+    
     if len(chat_history) == 0:
         return input_text
 
@@ -75,6 +79,7 @@ def reformulate_user_question(input_text: str, chat_history: List[str]) -> str:
 
     return llm_answer
 
+
 def generate_chatbot_response(user_question: str, vectorstore, top_k: int, fetch_k: int):
     """
     Genera una respuesta del chatbot basada en documentos relevantes y la pregunta del usuario.
@@ -90,13 +95,8 @@ def generate_chatbot_response(user_question: str, vectorstore, top_k: int, fetch
 
     Returns:
         dict: Respuesta del modelo LLM en formato streaming
-    """
-    top_documents = extract_top_documents(
-        vectorstore,
-        prompt_request=user_question,
-        top_k=top_k,
-        fetch_k=fetch_k
-    )
+    """    
+    top_documents = extract_top_documents(vectorstore, prompt_request=user_question, top_k=top_k, fetch_k=fetch_k)
     llm_context = parse_document(top_documents)
 
     prompt_user = CHATBOT_PROMPT_USER.format(

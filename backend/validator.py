@@ -4,7 +4,8 @@ from retriever import load_vectorstore, extract_top_documents, parse_document
 from augmented_generator import llm_response
 from prompt_engineering import CHATBOT_PROMPT_SYSTEM, CHATBOT_PROMPT_USER
 
-def validator_response(vectorstore_name: str, input_prompt: str, input_llm: str) -> str:
+
+def validator_response(vectorstore_name: str, input_prompt: str, input_llm: str):
     """
     Genera una respuesta validada utilizando un sistema RAG (Retrieval-Augmented Generation).
 
@@ -31,26 +32,20 @@ def validator_response(vectorstore_name: str, input_prompt: str, input_llm: str)
             "Explica el concepto de machine learning"
         )
     """
+    
+    # First, load the secrets files to access environmental variables
     load_secrets([".env.file", ".env.secrets"])
 
-    vectorstore = load_vectorstore(
-        embeddings_model=get_embeddings_model(),
-        pdf_file_path=f"{vectorstore_name}.pdf"
-    )
+    # Load vectorstore
+    vectorstore = load_vectorstore(embeddings_model=get_embeddings_model(), pdf_file_path=f"{vectorstore_name}.pdf")
 
+    # Set number of docs to retrieve
     fetch_k = int(os.getenv("DOCUMENTS_TO_RETRIEVE"))
     top_k = int(os.getenv("DOCUMENTS_TO_FETCH"))
 
-    return generate_validator_response(
-        vectorstore,
-        input_prompt,
-        input_llm,
-        top_k,
-        fetch_k
-    )
+    return generate_validator_response(vectorstore, input_prompt, input_llm, top_k, fetch_k)
 
-def generate_validator_response(vectorstore, input_prompt: str, input_llm: str,
-                              top_k: int, fetch_k: int) -> str:
+def generate_validator_response(vectorstore, input_prompt, input_llm, top_k, fetch_k):
     """
     Genera una respuesta validada basada en documentos relevantes y prompts específicos.
 
@@ -71,19 +66,10 @@ def generate_validator_response(vectorstore, input_prompt: str, input_llm: str,
         Utiliza los prompts definidos en CHATBOT_PROMPT_SYSTEM y CHATBOT_PROMPT_USER
         para generar respuestas contextualizadas.
     """
-    top_documents = extract_top_documents(
-        vectorstore,
-        prompt_request=input_prompt,
-        top_k=top_k,
-        fetch_k=fetch_k
-    )
+    
+    top_documents = extract_top_documents(vectorstore, prompt_request=input_prompt, top_k=top_k, fetch_k=fetch_k)
     llm_context = parse_document(top_documents)
 
-    prompt_user = CHATBOT_PROMPT_USER.format(
-        question=input_llm,
-        context=llm_context
-    )
-    return llm_response(
-        prompt_system=CHATBOT_PROMPT_SYSTEM,
-        prompt_user=prompt_user
-    ).choices[0].message.content
+    # Generate llm response
+    prompt_user = CHATBOT_PROMPT_USER.format(question=input_llm, context=llm_context)
+    return llm_response(prompt_system=CHATBOT_PROMPT_SYSTEM, prompt_user=prompt_user).choices[0].message.content

@@ -8,7 +8,7 @@ Ante la tarea de extraer información del contrato de una licitación se pide ex
 del contrato de licitación. Como recurso de apoyo se proporciona la Definición de Campo pero en ningún caso debe formar parte
 de la respuesta. Extrae la información del Campo a partir del Contexto. El Contexto contiene la información relevante del
 contrato de licitación para extraer la información del Campo. Incluye toda la información relevante del Contexto en la respuesta.
-Responde en español. Cuando la respuesta no esté disponible, devuelve 'No se encontro información en el contexto'. Devuelve la respuesta directamente
+Responde en español. Cuando la respuesta no esté disponible, devuelve 'No se encontro información en el documento'. Devuelve la respuesta directamente
 sin poner previamente el nombre del campo.
 
 Campo: {variable}

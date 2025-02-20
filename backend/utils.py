@@ -1,11 +1,17 @@
 import os
 from dotenv import load_dotenv
-from typing import List, Union
+from typing import List
 import pathlib
+
 from langchain_openai import AzureOpenAIEmbeddings, OpenAIEmbeddings, ChatOpenAI
 from langchain_core.documents import Document
 
-def load_secrets(secrets_files: List) -> None:
+
+
+
+## LOAD SECRETS
+
+def load_secrets(secrets_files: List):
     """
     Carga las variables de entorno desde los archivos especificados.    
 
@@ -18,12 +24,18 @@ def load_secrets(secrets_files: List) -> None:
     Example:
         load_secrets(['secrets.env'])
     """
+    
     parent_dir = os.path.dirname(os.path.abspath(__file__))
     for secrets_file in secrets_files:
         secrets_file_path = os.path.join(parent_dir, '..', secrets_file)
         load_dotenv(secrets_file_path)
 
-def get_embeddings_model() -> Union[AzureOpenAIEmbeddings, OpenAIEmbeddings]:
+###############
+
+
+## EMBEDDINGS MODEL
+
+def get_embeddings_model():
     """
     Inicializa y retorna un modelo de embeddings basado en la configuración del entorno.
 
@@ -43,6 +55,7 @@ def get_embeddings_model() -> Union[AzureOpenAIEmbeddings, OpenAIEmbeddings]:
         - Para Azure: AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, LLM_EMBEDDING_MODEL
         - Para OpenAI: OPENAI_API_KEY
     """
+        
     if "azure" in os.getenv("LLM_MODEL").lower():
         os.environ["AZURE_OPENAI_API_KEY"] = os.getenv("AZURE_OPENAI_API_KEY")
         os.environ["AZURE_OPENAI_ENDPOINT"] = os.getenv("AZURE_OPENAI_ENDPOINT")

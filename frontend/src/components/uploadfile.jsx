@@ -69,6 +69,7 @@ function FileUploader({ generatedSummaries, setGeneratedSummaries, isLoading, se
                 tableData: finalTransformedData,
                 conversations: [],
                 validation: false,
+                ragResult: jsonResponse.rag_result, // Guardamos rag_result
             };
 
             // Add new summary data to the list

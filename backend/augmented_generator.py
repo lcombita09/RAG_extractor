@@ -5,6 +5,11 @@ def llm_response(prompt_system: str, prompt_user: str, stream: bool = False) -> 
     """
     Genera una respuesta utilizando un modelo de lenguaje LLM a través de litellm.
 
+
+def llm_response(prompt_system, prompt_user, stream=False):
+  """
+    Genera una respuesta utilizando un modelo de lenguaje LLM a través de litellm.
+
     Esta función configura y realiza una llamada al modelo GPT-4o mini usando la API de OpenAI,
     procesando un prompt de sistema y un prompt de usuario.
 
@@ -31,6 +36,9 @@ def llm_response(prompt_system: str, prompt_user: str, stream: bool = False) -> 
             stream=False
         )
     """
+
+    
+
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
     return completion(
@@ -43,3 +51,4 @@ def llm_response(prompt_system: str, prompt_user: str, stream: bool = False) -> 
         temperature=0,
         max_tokens=512,
     )
+
