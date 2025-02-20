@@ -1,6 +1,7 @@
 import json
 import os
 import pickle
+import pandas as pd
 from langchain_openai import ChatOpenAI
 from ragas import evaluate, EvaluationDataset # funcion para evaluar
 from ragas.llms import LangchainLLMWrapper # evaluador llm
@@ -18,8 +19,17 @@ from utils import get_embeddings_model, load_secrets
 
 load_secrets([".env.file", ".env.secrets"])
 
-def load_ground_truth(file_name: str):    
-   # Load json with variables expected answers.
+def load_ground_truth(file_name: str):
+    """
+    Carga los datos de validación desde un archivo JSON.
+
+    Args:
+        file_name (str): Nombre del archivo de validación
+
+    Returns:
+        dict: Datos de validación para el archivo especificado
+    """    
+   
    
     with open("backend/validation.json", "r", encoding="utf-8") as f:
         json_data = json.load(f)
@@ -30,20 +40,38 @@ def load_ground_truth(file_name: str):
 
 
 def evaluator_llm():
+    """
+    Inicializa el modelo LLM evaluador.
+
+    Returns:
+        LangchainLLMWrapper: Instancia del modelo evaluador configurado
+    """
     
     evaluator_llm = LangchainLLMWrapper(ChatOpenAI(model="gpt-4o-mini", temperature=0))
     return evaluator_llm
 
-def semantic_similarity_metric():  
-    
+def semantic_similarity_metric():
+    """
+    Configura la métrica de similitud semántica.
+
+    Returns:
+        SemanticSimilarity: Instancia configurada del evaluador de similitud semántica
+    """    
     scorer = SemanticSimilarity(embeddings=LangchainEmbeddingsWrapper(get_embeddings_model()))    
     
     return scorer   
     
 ### Instanciar objetos de las metricas con LLM as a judge con Prompts en español.
 
-def context_recall_metric():    
-    
+def context_recall_metric():
+    """
+    Configura la métrica de recall del contexto con prompts en español.
+
+    Personaliza los ejemplos y clasificaciones para la evaluación en español.
+
+    Returns:
+        LLMContextRecall: Instancia configurada del evaluador de recall
+    """    
     scorer = LLMContextRecall()
     prompts = scorer.get_prompts()
     
@@ -93,7 +121,15 @@ def context_recall_metric():
     return scorer
 
 def context_precision_metric():    
-           
+    """
+    Configura la métrica de precisión del contexto con prompts en español.
+
+    Personaliza los ejemplos y evaluaciones para la medición de precisión en español.
+
+    Returns:
+        LLMContextPrecisionWithReference: Instancia configurada del evaluador de precisión
+    """
+    
     scorer = LLMContextPrecisionWithReference()
     prompts = scorer.get_prompts()
     
@@ -149,7 +185,15 @@ def context_precision_metric():
     return scorer
 
 def faithfulness_metric():
-        
+    """
+    Configura la métrica de fidelidad con prompts en español.
+
+    Establece ejemplos y criterios para evaluar la fidelidad de las respuestas.
+
+    Returns:
+        Faithfulness: Instancia configurada del evaluador de fidelidad
+    """
+    
     scorer = Faithfulness()
     
     prompts = scorer.get_prompts()   
@@ -207,6 +251,14 @@ def faithfulness_metric():
     return scorer
 
 def response_relevancy_metric():
+    """
+    Configura la métrica de relevancia de respuesta con prompts en español.
+
+    Establece criterios para evaluar la relevancia de las respuestas generadas.
+
+    Returns:
+        ResponseRelevancy: Instancia configurada del evaluador de relevancia
+    """
     
     scorer = ResponseRelevancy()
     prompts = scorer.get_prompts()
@@ -224,8 +276,17 @@ def response_relevancy_metric():
     return scorer
 
 
-def rag_system_evaluation():
-    
+def rag_system_evaluation() -> pd.DataFrame:
+    """
+    Realiza una evaluación completa del sistema RAG utilizando múltiples métricas.
+
+    Esta función coordina la evaluación del sistema RAG utilizando diferentes métricas
+    incluyendo similitud semántica, recall, precisión, fidelidad y relevancia.
+        
+    Returns:
+        pd.DataFrame: DataFrame con los resultados de la evaluación.    
+       
+    """
     semantic = semantic_similarity_metric()
     recall = context_recall_metric()
     precision = context_precision_metric()
@@ -240,8 +301,7 @@ def rag_system_evaluation():
     
     llm_evaluador = evaluator_llm()
     
-    os.environ["RAGAS_APP_TOKEN"] = os.getenv("RAGAS_APP_TOKEN")
-    
+        
     results = evaluate(
         dataset=dataset,
         metrics=[
@@ -254,7 +314,7 @@ def rag_system_evaluation():
         llm=llm_evaluador,      
     )
     
-    # results.upload()
+    
     evaluacion = results.to_pandas()
     
     return "Evaluación realizada con éxito"

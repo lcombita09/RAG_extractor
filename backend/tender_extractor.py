@@ -14,6 +14,23 @@ from retriever import load_vectorstore, extract_top_documents, parse_document, l
 
 
 def tender_data_extractor(pdf_file_path):
+    """
+    Extrae información estructurada de un documento de licitación en PDF.
+
+    Esta función coordina el proceso de extracción de información utilizando un sistema RAG,
+    procesando múltiples variables definidas y generando un resumen estructurado.
+
+    Args:
+        pdf_file_path (str): Ruta al archivo PDF de la licitación
+
+    Returns:
+        dict: Diccionario ordenado con la información extraída para cada variable
+
+    Note:
+        Utiliza variables globales 'referencias', 'queries' y 'rag_result' para
+        almacenar datos intermedios necesarios para la evaluación del sistema RAG.
+    """
+    
     # First, load the secrets files to access environmental variables
     load_secrets([".env.file", ".env.secrets"])
 
@@ -56,17 +73,54 @@ def tender_data_extractor(pdf_file_path):
     return ordered_tender_resume
 
 def process_variable(variable_info, vectorstore, top_k, fetch_k):
+    """
+    Procesa una variable específica para extraer su información del documento.
+
+    Args:
+        variable_info (dict): Diccionario con la variable y su definición
+        vectorstore: Instancia del almacén de vectores
+        top_k (int): Número de documentos a retornar
+        fetch_k (int): Número de documentos a recuperar
+
+    Returns:
+        tuple: (nombre_variable, información_extraída)
+    """
+    
     variable, variable_definition = list(variable_info.items())[0]
     variable_info = add_variable_info(variable, variable_definition, vectorstore, top_k=top_k, fetch_k=fetch_k)
     return variable, variable_info
 
 def load_variables_to_resume():
+    """
+    Carga la lista de variables a extraer desde un archivo JSON.
+
+    Returns:
+        list: Lista de variables y sus definiciones
+    """
+    
     # Load json with variables names
     with open("backend/variables_to_extract.json", "r", encoding="utf-8") as f:
         json_data = json.load(f)
     return json_data["variables"]
 
 def add_variable_info(variable, variable_definition, vectorstore, top_k, fetch_k):
+    """
+    Extrae información específica para una variable utilizando RAG.
+
+    Args:
+        variable (str): Nombre de la variable a extraer
+        variable_definition (str): Definición de la variable
+        vectorstore: Instancia del almacén de vectores
+        top_k (int): Número de documentos a retornar
+        fetch_k (int): Número de documentos a recuperar
+
+    Returns:
+        str: Información extraída para la variable
+
+    Note:
+        Agrega la muestra generada a 'rag_result' para evaluación posterior
+    """
+    
     # RAG to get context for given variable
     rag_query = queries[variable]
     top_documents = extract_top_documents(vectorstore, prompt_request=rag_query, top_k=top_k, fetch_k=fetch_k)
@@ -93,7 +147,7 @@ if __name__ == '__main__':
     base_dir = os.path.dirname(os.path.abspath(__file__))
     pdf_file_dir = os.path.join(base_dir, '..', "pdf_files\\")
     
-    file_name = "document_852.pdf"
+    file_name = "document_799.pdf"
     pdf_file_path = pdf_file_dir + file_name
     print(pdf_file_path)
     result = tender_data_extractor(pdf_file_path)        
