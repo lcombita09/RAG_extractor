@@ -1,6 +1,10 @@
 from litellm import completion
 import os
 
+def llm_response(prompt_system: str, prompt_user: str, stream: bool = False) -> dict:
+    """
+    Genera una respuesta utilizando un modelo de lenguaje LLM a través de litellm.
+
 
 def llm_response(prompt_system, prompt_user, stream=False):
   """
@@ -32,14 +36,19 @@ def llm_response(prompt_system, prompt_user, stream=False):
             stream=False
         )
     """
+
     
-  os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-  
-  return completion(
-    model="gpt-4o-mini-2024-07-18",
-    messages=[{ "content": prompt_system, "role": "system"},
-              { "content": prompt_user, "role": "user"}],
-    stream=stream,
-    temperature=0,
-    max_tokens=512,
-  )
+
+    os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+
+    return completion(
+        model="gpt-4o-mini-2024-07-18",
+        messages=[
+            {"content": prompt_system, "role": "system"},
+            {"content": prompt_user, "role": "user"}
+        ],
+        stream=stream,
+        temperature=0,
+        max_tokens=512,
+    )
+

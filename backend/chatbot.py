@@ -5,7 +5,6 @@ from retriever import load_vectorstore, extract_top_documents, parse_document
 from augmented_generator import llm_response
 from prompt_engineering import GET_CONTEXT_PROMPT_SYSTEM, GET_CONTEXT_PROMPT_USER, CHATBOT_PROMPT_SYSTEM, CHATBOT_PROMPT_USER
 
-
 def chatbot_response(vectorstore_name: str, input_text: str, chat_history: List[str]):
     """
     Genera una respuesta del chatbot basada en el contexto del documento y el historial de chat.
@@ -30,19 +29,18 @@ def chatbot_response(vectorstore_name: str, input_text: str, chat_history: List[
     # First, load the secrets files to access environmental variables
     load_secrets([".env.file", ".env.secrets"])
 
-    # Load vectorstore
-    vectorstore = load_vectorstore(embeddings_model=get_embeddings_model(), pdf_file_path=f"{vectorstore_name}.pdf")
+    vectorstore = load_vectorstore(embeddings_model=get_embeddings_model(),
+                                 pdf_file_path=f"{vectorstore_name}.pdf")
 
-    # Reformulate user question
     user_question = reformulate_user_question(input_text, chat_history)
 
-    # Set number of docs to retrieve
     fetch_k = int(os.getenv("DOCUMENTS_TO_RETRIEVE"))
     top_k = int(os.getenv("DOCUMENTS_TO_FETCH"))
 
     return generate_chatbot_response(user_question, vectorstore, top_k, fetch_k)
 
-def reformulate_user_question(input_text, chat_history):
+
+def reformulate_user_question(input_text: str, chat_history: List[str]) -> str:
     """
     Reformula la pregunta del usuario considerando el contexto del historial de chat.
 
@@ -63,20 +61,26 @@ def reformulate_user_question(input_text, chat_history):
     
     if len(chat_history) == 0:
         return input_text
-    
+
     user_questions = chat_history[::2]
     if len(user_questions) > 5:
         user_questions = user_questions[-5:]
     else:
         user_questions = chat_history
-    
-    # Generate llm response
-    prompt_user = GET_CONTEXT_PROMPT_USER.format(question=input_text, history_questions=user_questions)
-    llm_answer = llm_response(prompt_system=GET_CONTEXT_PROMPT_SYSTEM, prompt_user=prompt_user).choices[0].message.content
+
+    prompt_user = GET_CONTEXT_PROMPT_USER.format(
+        question=input_text,
+        history_questions=user_questions
+    )
+    llm_answer = llm_response(
+        prompt_system=GET_CONTEXT_PROMPT_SYSTEM,
+        prompt_user=prompt_user
+    ).choices[0].message.content
 
     return llm_answer
 
-def generate_chatbot_response(user_question, vectorstore, top_k, fetch_k):    
+
+def generate_chatbot_response(user_question: str, vectorstore, top_k: int, fetch_k: int):
     """
     Genera una respuesta del chatbot basada en documentos relevantes y la pregunta del usuario.
 
@@ -91,11 +95,16 @@ def generate_chatbot_response(user_question, vectorstore, top_k, fetch_k):
 
     Returns:
         dict: Respuesta del modelo LLM en formato streaming
-    """
-    
+    """    
     top_documents = extract_top_documents(vectorstore, prompt_request=user_question, top_k=top_k, fetch_k=fetch_k)
     llm_context = parse_document(top_documents)
 
-    # Generate llm response
-    prompt_user = CHATBOT_PROMPT_USER.format(question=user_question, context=llm_context)
-    return llm_response(prompt_system=CHATBOT_PROMPT_SYSTEM, prompt_user=prompt_user, stream=True)
+    prompt_user = CHATBOT_PROMPT_USER.format(
+        question=user_question,
+        context=llm_context
+    )
+    return llm_response(
+        prompt_system=CHATBOT_PROMPT_SYSTEM,
+        prompt_user=prompt_user,
+        stream=True
+    )
